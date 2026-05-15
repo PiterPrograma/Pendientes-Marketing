@@ -1,0 +1,11 @@
+{
+  "name": "pendientes-marketing",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15"
+  }
+}
