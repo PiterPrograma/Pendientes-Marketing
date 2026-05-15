@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pendientes Marketing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F8F7F4; color: #1a1a1a; min-height: 100vh; }
+    .setup { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+    .setup-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 2rem; width: 100%; max-width: 440px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+    .setup-logo { font-size: 24px; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
+    .setup-sub { font-size: 13px; color: #64748B; margin-bottom: 1.5rem; line-height: 1.6; }
+    .field-label { display: block; font-size: 11px; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .field-group { margin-bottom: 1rem; }
+    input, select, textarea { width: 100%; padding: 9px 11px; border: 1px solid #E2E8F0; border-radius: 7px; font-size: 13px; color: #1E293B; background: #F9FAFB; font-family: inherit; outline: none; transition: border-color 0.15s; }
+    input:focus, select:focus, textarea:focus { border-color: #94A3B8; background: #fff; }
+    .connect-btn { width: 100%; padding: 11px; background: #0F172A; color: #fff; border: none; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s; }
+    .connect-btn:hover { opacity: 0.85; }
+    .connect-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .err { font-size: 12px; color: #B71C1C; padding: 9px 11px; background: #FEE2E2; border-radius: 7px; margin-top: 10px; display: none; line-height: 1.5; }
+    .app { display: none; }
+    .topbar { background: #0F172A; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .topbar-title { color: #F1F5F9; font-size: 16px; font-weight: 700; }
+    .topbar-sub { color: #64748B; font-size: 11px; margin-top: 2px; font-family: monospace; }
+    .top-actions { display: flex; gap: 8px; }
+    .btn { padding: 7px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.15s; }
+    .btn-outline { background: transparent; border: 1px solid #334155; color: #94A3B8; }
+    .btn-outline:hover { background: #1E293B; }
+    .btn-add { background: #3B82F6; border: none; color: #fff; }
+    .btn-add:hover { background: #2563EB; }
+    .filterbar { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 10px 24px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .filterbar select { width: auto; font-size: 12px; padding: 5px 8px; }
+    .filter-label { font-size: 11px; color: #94A3B8; }
+    .count { margin-left: auto; font-size: 11px; color: #94A3B8; font-family: monospace; }
+    .list { padding: 20px 24px; max-width: 900px; }
+    .section-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-top: 20px; }
+    .section-hdr:first-child { margin-top: 0; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sec-name { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-family: monospace; }
+    .sec-count { font-size: 11px; color: #94A3B8; font-family: monospace; }
+    .card { background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px; margin-bottom: 6px; display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: start; }
+    .card-num { font-size: 10px; color: #CBD5E1; font-family: monospace; font-weight: 700; padding-top: 2px; }
+    .card-text { font-size: 13px; color: #1E293B; line-height: 1.45; }
+    .card-note { font-size: 11px; color: #94A3B8; margin-top: 4px; }
+    .card-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .pill { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-family: monospace; font-weight: 600; }
+    .pill-alta { background: #FEE2E2; color: #991B1B; }
+    .pill-media { background: #FEF3C7; color: #92400E; }
+    .pill-baja { background: #D1FAE5; color: #065F46; }
+    .pill-date { background: #F1F5F9; color: #475569; }
+    .card-actions { display: flex; gap: 4px; }
+    .icon-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; color: #94A3B8; font-size: 16px; line-height: 1; transition: all 0.1s; }
+    .icon-btn:hover { background: #F1F5F9; color: #374151; }
+    .empty { text-align: center; padding: 4rem; color: #94A3B8; font-size: 13px; }
+    .loading { text-align: center; padding: 3rem; color: #94A3B8; font-size: 13px; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+    .overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .modal-title { font-size: 15px; font-weight: 700; color: #0F172A; margin-bottom: 1rem; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+    .btn-cancel { background: #fff; border: 1px solid #E2E8F0; color: #374151; }
+    .btn-cancel:hover { background: #F9FAFB; }
+    .btn-save { background: #0F172A; border: none; color: #fff; }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #0F172A; color: #fff; padding: 11px 18px; border-radius: 8px; font-size: 12px; font-family: monospace; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; z-index: 200; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.err { background: #B71C1C; }
+  </style>
+</head>
+<body>
+
+<div class="setup" id="setup">
+  <div class="setup-card">
+    <div class="setup-logo">Pendientes Marketing</div>
+    <div class="setup-sub">Ingresa tus credenciales de Notion. Se guardan solo en tu navegador.</div>
+    <div class="field-group">
+      <label class="field-label">Token de integración</label>
+      <input type="password" id="tokenInput" placeholder="secret_xxxxxxxxxxxx" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">Database ID</label>
+      <input type="text" id="dbIdInput" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+    </div>
+    <button class="connect-btn" id="connectBtn" onclick="connect()">Conectar con Notion</button>
+    <div class="err" id="setupErr"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Pendientes Marketing</div>
+      <div class="topbar-sub" id="syncStatus">Conectando...</div>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-outline" onclick="load()">↺ Recargar</button>
+      <button class="btn btn-add" onclick="openModal()">+ Agregar</button>
+    </div>
+  </div>
+  <div class="filterbar">
+    <span class="filter-label">Filtrar:</span>
+    <select id="filterLocal" onchange="render()">
+      <option value="">Todos los locales</option>
+      <option>Birreria Quito</option><option>Quioto</option>
+      <option>Blend Miravalle</option><option>Blend Ceramica</option>
+      <option>Birreria Cumbaya</option><option>IGNIS</option>
+    </select>
+    <select id="filterPrio" onchange="render()">
+      <option value="">Todas las prioridades</option>
+      <option>Alta</option><option>Media</option><option>Baja</option>
+    </select>
+    <span class="count" id="countBadge"></span>
+  </div>
+  <div class="list" id="listArea"><div class="loading">Cargando...</div></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Nuevo pendiente</div>
+    <div class="field-group">
+      <label class="field-label">Local *</label>
+      <select id="fLocal">
+        <option value="">Seleccionar...</option>
+        <option>Birreria Quito</option><option>Quioto</option>
+        <option>Blend Miravalle</option><option>Blend Ceramica</option>
+        <option>Birreria Cumbaya</option><option>IGNIS</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Pendiente *</label>
+      <textarea id="fPendiente" rows="3" placeholder="Descripcion del pendiente..."></textarea>
+    </div>
+    <div class="two-col">
+      <div class="field-group">
+        <label class="field-label">Deadline</label>
+        <input type="date" id="fDeadline" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Prioridad</label>
+        <select id="fPrioridad">
+          <option value="">Sin prioridad</option>
+          <option>Alta</option><option>Media</option><option>Baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Notas</label>
+      <input type="text" id="fNotas" placeholder="Contexto adicional..." />
+    </div>
+    <div class="err" id="modalErr"></div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-save" id="saveBtn" onclick="save()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LOCALES = {
+  "Birreria Quito": "#1565C0",
+  "Quioto": "#E65100",
+  "Blend Miravalle": "#2E7D32",
+  "Blend Ceramica": "#6A1B9A",
+  "Birreria Cumbaya": "#0277BD",
+  "IGNIS": "#B71C1C"
+};
+
+let token = "", dbId = "", items = [], editId = null;
+const API = "/api/notion";
+
+async function api(action, method, body, pageId) {
+  const url = new URL(API, location.origin);
+  url.searchParams.set("action", action);
+  if (pageId) url.searchParams.set("pageId", pageId);
+  const res = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "x-notion-token": token,
+      "x-database-id": dbId
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || data.error || "Error de Notion");
+  return data;
+}
+
+function parse(page) {
+  const p = page.properties;
+  const txt = (prop) => prop?.title?.map(t=>t.plain_text).join("") || prop?.rich_text?.map(t=>t.plain_text).join("") || "";
+  return {
+    id: page.id,
+    pendiente: txt(p["Pendiente"] || p["Name"] || p["name"]),
+    local: p["Local"]?.select?.name || "",
+    deadline: p["Deadline"]?.date?.start || "",
+    prioridad: p["Prioridad"]?.select?.name || "",
+    notas: txt(p["Notas"])
+  };
+}
+
+async function connect() {
+  const t = document.getElementById("tokenInput").value.trim();
+  const d = document.getElementById("dbIdInput").value.trim().replace(/-/g,"");
+  const err = document.getElementById("setupErr");
+  if (!t || !d) { showSetupErr("Completa ambos campos"); return; }
+
+  token = t; dbId = d;
+  localStorage.setItem("pm_token", t);
+  localStorage.setItem("pm_dbid", d);
+  document.getElementById("connectBtn").disabled = true;
+  document.getElementById("connectBtn").textContent = "Conectando...";
+  err.style.display = "none";
+  try {
+    await load(true);
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  } catch(e) {
+    token = ""; dbId = "";
+    showSetupErr("No se pudo conectar. Error: " + e.message);
+  } finally {
+    document.getElementById("connectBtn").disabled = false;
+    document.getElementById("connectBtn").textContent = "Conectar con Notion";
+  }
+}
+
+async function load(initial=false) {
+  if (!initial) setSyncStatus("Sincronizando...");
+  const data = await api("query", "POST", { sorts:[{property:"Local",direction:"ascending"}] });
+  items = data.results.map(parse);
+  render();
+  setSyncStatus("Sincronizado con Notion · " + items.length + " pendientes");
+}
+
+function setSyncStatus(t) { document.getElementById("syncStatus").textContent = t; }
+
+function render() {
+  const fl = document.getElementById("filterLocal").value;
+  const fp = document.getElementById("filterPrio").value;
+  const filtered = items.filter(p => (!fl||p.local===fl) && (!fp||p.prioridad===fp));
+  document.getElementById("countBadge").textContent = filtered.length + " de " + items.length;
+  const area = document.getElementById("listArea");
+  if (!filtered.length) { area.innerHTML = '<div class="empty">No hay pendientes con estos filtros</div>'; return; }
+  const byLocal = {};
+  Object.keys(LOCALES).forEach(l => byLocal[l] = []);
+  filtered.forEach(p => { if (byLocal[p.local] !== undefined) byLocal[p.local].push(p); });
+  let html = "", n = 1;
+  Object.entries(LOCALES).forEach(([local, color]) => {
+    const its = byLocal[local];
+    if (!its.length) return;
+    html += `<div class="section-hdr"><div class="dot" style="background:${color}"></div><span class="sec-name" style="color:${color}">${local}</span><span class="sec-count">(${its.length})</span></div>`;
+    its.forEach(p => {
+      const pc = p.prioridad==="Alta"?"pill-alta":p.prioridad==="Media"?"pill-media":p.prioridad==="Baja"?"pill-baja":"";
+      html += `<div class="card"><span class="card-num">${String(n++).padStart(2,"0")}</span><div><div class="card-text">${p.pendiente}</div>${p.notas?`<div class="card-note">💬 ${p.notas}</div>`:""}<div class="card-meta">${p.prioridad?`<span class="pill ${pc}">${p.prioridad}</span>`:""}${p.deadline?`<span class="pill pill-date">📅 ${p.deadline}</span>`:""}</div></div><div class="card-actions"><button class="icon-btn" onclick="editItem('${p.id}')">✏️</button><button class="icon-btn" onclick="deleteItem('${p.id}')">🗑️</button></div></div>`;
+    });
+  });
+  area.innerHTML = html;
+}
+
+function openModal(reset=true) {
+  if (reset) {
+    editId = null;
+    document.getElementById("modalTitle").textContent = "Nuevo pendiente";
+    document.getElementById("saveBtn").textContent = "Agregar";
+    ["fLocal","fPendiente","fDeadline","fPrioridad","fNotas"].forEach(id => document.getElementById(id).value = "");
+  }
+  document.getElementById("modalErr").style.display = "none";
+  document.getElementById("overlay").classList.add("open");
+}
+function closeModal() { document.getElementById("overlay").classList.remove("open"); editId = null; }
+
+function editItem(id) {
+  const p = items.find(x=>x.id===id);
+  if (!p) return;
+  editId = id;
+  document.getElementById("modalTitle").textContent = "Editar pendiente";
+  document.getElementById("saveBtn").textContent = "Guardar cambios";
+  document.getElementById("fLocal").value = p.local;
+  document.getElementById("fPendiente").value = p.pendiente;
+  document.getElementById("fDeadline").value = p.deadline;
+  document.getElementById("fPrioridad").value = p.prioridad;
+  document.getElementById("fNotas").value = p.notas;
+  openModal(false);
+}
+
+async function save() {
+  const local = document.getElementById("fLocal").value;
+  const pendiente = document.getElementById("fPendiente").value.trim();
+  const deadline = document.getElementById("fDeadline").value;
+  const prioridad = document.getElementById("fPrioridad").value;
+  const notas = document.getElementById("fNotas").value.trim();
+  if (!local || !pendiente) { showModalErr("Local y pendiente son obligatorios"); return; }
+  const props = {
+    "Pendiente": { title: [{ text: { content: pendiente } }] },
+    "Local": { select: { name: local } },
+    "Notas": { rich_text: notas ? [{ text: { content: notas } }] : [] }
+  };
+  if (prioridad) props["Prioridad"] = { select: { name: prioridad } };
+  if (deadline) props["Deadline"] = { date: { start: deadline } };
+  document.getElementById("saveBtn").disabled = true;
+  document.getElementById("modalErr").style.display = "none";
+  try {
+    if (editId) {
+      await api("update", "PATCH", { properties: props }, editId);
+      toast("Actualizado en Notion ✓");
+    } else {
+      await api("create", "POST", { parent: { database_id: dbId }, properties: props });
+      toast("Agregado a Notion ✓");
+    }
+    closeModal();
+    await load();
+  } catch(e) {
+    showModalErr("Error: " + e.message);
+  } finally {
+    document.getElementById("saveBtn").disabled = false;
+  }
+}
+
+async function deleteItem(id) {
+  if (!confirm("¿Eliminar este pendiente de Notion?")) return;
+  try {
+    await api("delete", "PATCH", null, id);
+    toast("Eliminado");
+    await load();
+  } catch(e) { toast("Error: " + e.message, true); }
+}
+
+function showSetupErr(msg) { const el = document.getElementById("setupErr"); el.textContent = msg; el.style.display = "block"; }
+function showModalErr(msg) { const el = document.getElementById("modalErr"); el.textContent = msg; el.style.display = "block"; }
+function toast(msg, isErr=false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast" + (isErr?" err":"");
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+window.onload = () => {
+  const t = localStorage.getItem("pm_token");
+  const d = localStorage.getItem("pm_dbid");
+  if (t && d) {
+    document.getElementById("tokenInput").value = t;
+    document.getElementById("dbIdInput").value = d;
+    token = t; dbId = d;
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    load(true).catch(() => {
+      token = ""; dbId = "";
+      document.getElementById("setup").style.display = "flex";
+      document.getElementById("app").style.display = "none";
+    });
+  }
+};
+</script>
+</body>
+</html>
