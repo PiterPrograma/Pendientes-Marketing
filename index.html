@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pendientes Marketing</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#1C1B18" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pendientes" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5F4F0; --surface: #FFFFFF; --surface2: #F0EFE9; --border: #E4E2DA;
+      --text: #1C1B18; --text2: #706E65; --text3: #A8A69E;
+      --red: #DC2626; --red-bg: #FEF2F2; --orange: #D97706; --orange-bg: #FFFBEB;
+      --green: #059669; --green-bg: #ECFDF5; --blue: #2563EB; --blue-bg: #EFF6FF;
+      --purple: #7C3AED; --purple-bg: #F5F3FF; --cyan: #0891B2; --cyan-bg: #ECFEFF;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .setup { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+    .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 420px; }
+    .setup-logo { font-size: 22px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.5px; }
+    .setup-sub { font-size: 13px; color: var(--text2); margin-bottom: 2rem; line-height: 1.6; }
+    .fl { display: block; font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-family: 'DM Mono', monospace; }
+    .fg { margin-bottom: 1.2rem; }
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: var(--surface2); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.15s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--text); background: var(--surface); }
+    .cbtn { width: 100%; padding: 12px; background: var(--text); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .cbtn:hover { opacity: 0.85; } .cbtn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .emsg { font-size: 12px; color: var(--red); padding: 10px 12px; background: var(--red-bg); border-radius: 8px; margin-top: 10px; display: none; line-height: 1.5; }
+    .app { display: none; }
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 210px; background: var(--text); padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 3px; z-index: 10; }
+    .slogo { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 1.2rem; padding: 0 8px; letter-spacing: -0.3px; }
+    .slogo span { display: block; font-size: 10px; font-weight: 400; color: #64748B; font-family: 'DM Mono', monospace; margin-top: 2px; }
+    .ni { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 7px; cursor: pointer; font-size: 13px; color: #94A3B8; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
+    .ni:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .ni.active { background: rgba(255,255,255,0.13); color: #fff; }
+    .ndiv { height: 1px; background: rgba(255,255,255,0.07); margin: 6px 0; }
+    .sbottom { margin-top: auto; font-size: 10px; color: #475569; font-family: 'DM Mono', monospace; padding: 0 10px; }
+    .main { margin-left: 210px; min-height: 100vh; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 13px 24px; display: flex; align-items: center; gap: 12px; }
+    .ptitle { font-size: 15px; font-weight: 600; flex: 1; letter-spacing: -0.3px; }
+    .sbox { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; width: 220px; }
+    .sbox input { background: none; border: none; font-size: 13px; padding: 0; }
+    .si { color: var(--text3); font-size: 15px; }
+    .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.12s; }
+    .btn:hover { background: var(--surface2); }
+    .btnp { background: var(--text); color: #fff; border-color: var(--text); }
+    .btnp:hover { opacity: 0.85; background: var(--text); }
+    .content { padding: 22px 24px; }
+    .sgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px; }
+    .sc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+    .sl { font-size: 10px; color: var(--text2); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+    .sv { font-size: 28px; font-weight: 600; letter-spacing: -1px; line-height: 1; }
+    .ss { font-size: 11px; color: var(--text3); margin-top: 4px; }
+    .crow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+    .cc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+    .ct { font-size: 10px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; font-family: 'DM Mono', monospace; }
+    .br { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+    .brl { font-size: 11px; width: 110px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .brt { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
+    .brf { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+    .brc { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; width: 20px; text-align: right; }
+    .lc { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+    .fs { width: auto; font-size: 12px; padding: 6px 10px; }
+    .ic { margin-left: auto; font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+    .sh { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-top: 18px; }
+    .sh:first-child { margin-top: 0; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sn { font-size: 10px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+    .sk { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 6px; display: grid; grid-template-columns: 20px 1fr auto auto; gap: 11px; align-items: start; transition: box-shadow 0.12s; }
+    .card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    .card.dc { opacity: 0.45; }
+    .cn { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; padding-top: 2px; }
+    .ct2 { font-size: 13px; line-height: 1.45; }
+    .ct2.sk2 { text-decoration: line-through; color: var(--text3); }
+    .cno { font-size: 11px; color: var(--text3); margin-top: 3px; }
+    .cm { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+    .pill { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-family: 'DM Mono', monospace; font-weight: 500; }
+    .pa { background: var(--red-bg); color: var(--red); }
+    .pm { background: var(--orange-bg); color: var(--orange); }
+    .pb { background: var(--green-bg); color: var(--green); }
+    .pd { background: var(--surface2); color: var(--text2); }
+    .pok { background: var(--green-bg); color: var(--green); }
+    .ca { display: flex; gap: 4px; }
+    .ib { background: none; border: none; cursor: pointer; padding: 4px 5px; border-radius: 6px; color: var(--text3); font-size: 14px; transition: all 0.1s; }
+    .ib:hover { background: var(--surface2); color: var(--text); }
+    .chk { background: none; border: 1.5px solid var(--border); cursor: pointer; padding: 0; border-radius: 50%; width: 19px; height: 19px; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.15s; flex-shrink: 0; margin-top: 2px; font-size: 11px; }
+    .chk:hover { border-color: var(--green); color: var(--green); }
+    .chk.ck { background: var(--green); border-color: var(--green); color: #fff; }
+    .empty { text-align: center; padding: 4rem; color: var(--text3); font-size: 13px; }
+    .loading { text-align: center; padding: 3rem; color: var(--text3); font-size: 13px; }
+    .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .kcol { background: var(--surface2); border-radius: 12px; padding: 13px; min-height: 350px; }
+    .kh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+    .kht { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; font-family: 'DM Mono', monospace; }
+    .khb { font-size: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 1px 7px; color: var(--text2); font-family: 'DM Mono', monospace; }
+    .kcard { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 11px 12px; margin-bottom: 7px; }
+    .kcard:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .klocal { font-size: 10px; font-family: 'DM Mono', monospace; font-weight: 500; margin-bottom: 5px; }
+    .ktxt { font-size: 12px; line-height: 1.4; }
+    .kmeta { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+    .kact { display: flex; gap: 5px; margin-top: 8px; }
+    .kbtn { font-size: 10px; padding: 3px 7px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .kbtn:hover { background: var(--border); }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; backdrop-filter: blur(2px); }
+    .overlay.open { display: flex; }
+    .modal { background: var(--surface); border-radius: 14px; padding: 1.75rem; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+    .mt { font-size: 16px; font-weight: 600; margin-bottom: 1.25rem; letter-spacing: -0.3px; }
+    .tc { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mf { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 11px 16px; border-radius: 9px; font-size: 12px; font-family: 'DM Mono', monospace; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; z-index: 200; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.terr { background: var(--red); }
+  </style>
+</head>
+<body>
+
+<div class="setup" id="setup">
+  <div class="setup-card">
+    <div class="setup-logo">Pendientes Marketing</div>
+    <div class="setup-sub">Conecta con tu base de datos de Notion para comenzar.</div>
+    <div class="fg"><label class="fl">Token de integración</label><input type="password" id="tokenInput" placeholder="ntn_... o secret_..." /></div>
+    <div class="fg"><label class="fl">Database ID</label><input type="text" id="dbIdInput" placeholder="a2c623b359354babb0c5bd1a478afad3" /></div>
+    <button class="cbtn" id="connectBtn" onclick="connect()">Conectar con Notion</button>
+    <div class="emsg" id="setupErr"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="slogo">Marketing Ops <span id="sidebarSync">—</span></div>
+    <button class="ni active" id="nav-dashboard" onclick="showView('dashboard')"><span>◼</span> Dashboard</button>
+    <button class="ni" id="nav-list" onclick="showView('list')"><span>≡</span> Lista</button>
+    <button class="ni" id="nav-kanban" onclick="showView('kanban')"><span>⊞</span> Kanban</button>
+    <div class="ndiv"></div>
+    <button class="ni" onclick="load()"><span>↺</span> Recargar</button>
+    <div class="sbottom" id="syncStatus">—</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="ptitle" id="pageTitle">Dashboard</div>
+      <div class="sbox"><span class="si">⌕</span><input type="text" id="searchInput" placeholder="Buscar..." oninput="onSearch()" /></div>
+      <button class="btn btnp" onclick="openModal()">+ Nuevo</button>
+    </div>
+    <div class="content">
+      <div id="view-dashboard">
+        <div class="sgrid" id="statsGrid"></div>
+        <div class="crow">
+          <div class="cc"><div class="ct">Pendientes por local</div><div id="chartLocal"></div></div>
+          <div class="cc"><div class="ct">Por prioridad</div><div id="chartPrio"></div></div>
+        </div>
+      </div>
+      <div id="view-list" style="display:none">
+        <div class="lc">
+          <select class="fs" id="filterLocal" onchange="renderList()">
+            <option value="">Todos los locales</option>
+            <option>Birreria Quito</option><option>Quioto</option><option>Blend Miravalle</option>
+            <option>Blend Ceramica</option><option>Birreria Cumbaya</option><option>IGNIS</option>
+          </select>
+          <select class="fs" id="filterPrio" onchange="renderList()">
+            <option value="">Todas las prioridades</option><option>Alta</option><option>Media</option><option>Baja</option>
+          </select>
+          <select class="fs" id="filterStatus" onchange="renderList()">
+            <option value="">Todos los estados</option><option value="pending">Solo pendientes</option><option value="done">Completados</option>
+          </select>
+          <span class="ic" id="listCount"></span>
+        </div>
+        <div id="listArea"><div class="loading">Cargando...</div></div>
+      </div>
+      <div id="view-kanban" style="display:none">
+        <div class="kanban">
+          <div class="kcol"><div class="kh"><span class="kht">Pendiente</span><span class="khb" id="k-count-pending">0</span></div><div id="k-pending"></div></div>
+          <div class="kcol"><div class="kh"><span class="kht">En proceso</span><span class="khb" id="k-count-process">0</span></div><div id="k-process"></div></div>
+          <div class="kcol"><div class="kh"><span class="kht">Completado</span><span class="khb" id="k-count-done">0</span></div><div id="k-done"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mt" id="modalTitle">Nuevo pendiente</div>
+    <div class="fg"><label class="fl">Local *</label>
+      <select id="fLocal"><option value="">Seleccionar...</option><option>Birreria Quito</option><option>Quioto</option><option>Blend Miravalle</option><option>Blend Ceramica</option><option>Birreria Cumbaya</option><option>IGNIS</option></select>
+    </div>
+    <div class="fg"><label class="fl">Pendiente *</label><textarea id="fPendiente" rows="3" placeholder="Descripcion..."></textarea></div>
+    <div class="tc">
+      <div class="fg"><label class="fl">Deadline</label><input type="date" id="fDeadline" /></div>
+      <div class="fg"><label class="fl">Prioridad</label><select id="fPrioridad"><option value="">Sin prioridad</option><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+    </div>
+    <div class="fg"><label class="fl">Estado</label><select id="fEstado"><option value="Pendiente">Pendiente</option><option value="En proceso">En proceso</option><option value="Completado">Completado</option></select></div>
+    <div class="fg"><label class="fl">Notas</label><input type="text" id="fNotas" placeholder="Contexto adicional..." /></div>
+    <div class="emsg" id="modalErr"></div>
+    <div class="mf">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btnp" id="saveBtn" onclick="save()">Agregar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const LOCALES = {"Birreria Quito":"#2563EB","Quioto":"#D97706","Blend Miravalle":"#059669","Blend Ceramica":"#7C3AED","Birreria Cumbaya":"#0891B2","IGNIS":"#DC2626"};
+let token="",dbId="",items=[],editId=null,searchQ="";
+const API="/api/notion";
+
+async function apiCall(action,method,body,pageId){
+  const url=new URL(API,location.origin);
+  url.searchParams.set("action",action);
+  if(pageId)url.searchParams.set("pageId",pageId);
+  const res=await fetch(url,{method,headers:{"Content-Type":"application/json","x-notion-token":token,"x-database-id":dbId},body:body?JSON.stringify(body):undefined});
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.message||data.error||"Error");
+  return data;
+}
+
+function parse(page){
+  const p=page.properties;
+  const txt=(prop)=>prop?.title?.map(t=>t.plain_text).join("")||prop?.rich_text?.map(t=>t.plain_text).join("")||"";
+  return{id:page.id,pendiente:txt(p["Pendiente"]||p["Name"]||p["name"]),local:p["Local"]?.select?.name||"",deadline:p["Deadline"]?.date?.start||"",prioridad:p["Prioridad"]?.select?.name||"",notas:txt(p["Notas"]),estado:p["Estado"]?.select?.name||"Pendiente"};
+}
+
+async function connect(){
+  const t=document.getElementById("tokenInput").value.trim();
+  const d=document.getElementById("dbIdInput").value.trim().replace(/-/g,"");
+  const err=document.getElementById("setupErr");
+  if(!t||!d){showE(err,"Completa ambos campos");return;}
+  token=t;dbId=d;
+  localStorage.setItem("pm_token",t);localStorage.setItem("pm_dbid",d);
+  const btn=document.getElementById("connectBtn");btn.disabled=true;btn.textContent="Conectando...";err.style.display="none";
+  try{await load(true);document.getElementById("setup").style.display="none";document.getElementById("app").style.display="block";}
+  catch(e){token="";dbId="";showE(err,"No se pudo conectar: "+e.message);}
+  finally{btn.disabled=false;btn.textContent="Conectar con Notion";}
+}
+
+async function load(initial=false){
+  if(!initial)document.getElementById("syncStatus").textContent="Sincronizando...";
+  const data=await apiCall("query","POST",{sorts:[{property:"Local",direction:"ascending"}]});
+  items=data.results.map(parse);
+  renderAll();
+  const ts=new Date().toLocaleTimeString("es",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("syncStatus").textContent=`Sync ${ts}`;
+  document.getElementById("sidebarSync").textContent=`${items.length} items`;
+}
+
+function renderAll(){renderDashboard();renderList();renderKanban();}
+
+function getFiltered(){
+  const fl=document.getElementById("filterLocal")?.value||"";
+  const fp=document.getElementById("filterPrio")?.value||"";
+  const fs=document.getElementById("filterStatus")?.value||"";
+  return items.filter(p=>{
+    return(!fl||p.local===fl)&&(!fp||p.prioridad===fp)&&(!fs||(fs==="done"?p.estado==="Completado":p.estado!=="Completado"))&&(!searchQ||p.pendiente.toLowerCase().includes(searchQ)||p.local.toLowerCase().includes(searchQ));
+  });
+}
+
+function renderDashboard(){
+  const total=items.length,comp=items.filter(p=>p.estado==="Completado").length,proc=items.filter(p=>p.estado==="En proceso").length,alta=items.filter(p=>p.prioridad==="Alta"&&p.estado!=="Completado").length;
+  document.getElementById("statsGrid").innerHTML=`
+    <div class="sc"><div class="sl">Total</div><div class="sv">${total}</div><div class="ss">pendientes</div></div>
+    <div class="sc"><div class="sl">Completados</div><div class="sv" style="color:var(--green)">${comp}</div><div class="ss">${total?Math.round(comp/total*100):0}%</div></div>
+    <div class="sc"><div class="sl">En proceso</div><div class="sv" style="color:var(--orange)">${proc}</div><div class="ss">en seguimiento</div></div>
+    <div class="sc"><div class="sl">Alta prioridad</div><div class="sv" style="color:var(--red)">${alta}</div><div class="ss">urgentes</div></div>`;
+  const lc={};Object.keys(LOCALES).forEach(l=>lc[l]=0);
+  items.filter(p=>p.estado!=="Completado").forEach(p=>{if(lc[p.local]!==undefined)lc[p.local]++;});
+  const mx=Math.max(...Object.values(lc),1);
+  document.getElementById("chartLocal").innerHTML=Object.entries(lc).map(([l,c])=>`<div class="br"><span class="brl">${l}</span><div class="brt"><div class="brf" style="width:${Math.round(c/mx*100)}%;background:${LOCALES[l]}"></div></div><span class="brc">${c}</span></div>`).join("");
+  const pc={"Alta":0,"Media":0,"Baja":0,"—":0},pcol={"Alta":"var(--red)","Media":"var(--orange)","Baja":"var(--green)","—":"var(--text3)"};
+  items.filter(p=>p.estado!=="Completado").forEach(p=>{if(p.prioridad&&pc[p.prioridad]!==undefined)pc[p.prioridad]++;else pc["—"]++;});
+  const mx2=Math.max(...Object.values(pc),1);
+  document.getElementById("chartPrio").innerHTML=Object.entries(pc).map(([k,v])=>`<div class="br"><span class="brl">${k}</span><div class="brt"><div class="brf" style="width:${Math.round(v/mx2*100)}%;background:${pcol[k]}"></div></div><span class="brc">${v}</span></div>`).join("");
+}
+
+function renderList(){
+  const filtered=getFiltered();
+  document.getElementById("listCount").textContent=`${filtered.length} de ${items.length}`;
+  const area=document.getElementById("listArea");
+  if(!filtered.length){area.innerHTML='<div class="empty">No hay pendientes con estos filtros</div>';return;}
+  const byL={};Object.keys(LOCALES).forEach(l=>byL[l]=[]);
+  filtered.forEach(p=>{if(byL[p.local]!==undefined)byL[p.local].push(p);});
+  let html="",n=1;
+  Object.entries(LOCALES).forEach(([local,color])=>{
+    const its=byL[local];if(!its.length)return;
+    html+=`<div class="sh"><div class="dot" style="background:${color}"></div><span class="sn" style="color:${color}">${local}</span><span class="sk">(${its.length})</span></div>`;
+    its.forEach(p=>{
+      const done=p.estado==="Completado";
+      const pc=p.prioridad==="Alta"?"pa":p.prioridad==="Media"?"pm":p.prioridad==="Baja"?"pb":"";
+      html+=`<div class="card ${done?"dc":""}"><span class="cn">${String(n++).padStart(2,"0")}</span><div><div class="ct2 ${done?"sk2":""}">${p.pendiente}</div>${p.notas?`<div class="cno">💬 ${p.notas}</div>`:""}<div class="cm">${p.prioridad?`<span class="pill ${pc}">${p.prioridad}</span>`:""}${p.deadline?`<span class="pill pd">📅 ${p.deadline}</span>`:""}${done?`<span class="pill pok">✓ Listo</span>`:p.estado==="En proceso"?`<span class="pill pm">En proceso</span>`:""}</div></div><button class="chk ${done?"ck":""}" onclick="toggleDone('${p.id}','${p.estado}')">✓</button><div class="ca"><button class="ib" onclick="editItem('${p.id}')">✏️</button><button class="ib" onclick="deleteItem('${p.id}')">🗑️</button></div></div>`;
+    });
+  });
+  area.innerHTML=html;
+}
+
+function renderKanban(){
+  const cols={"Pendiente":[],"En proceso":[],"Completado":[]};
+  items.filter(p=>!searchQ||p.pendiente.toLowerCase().includes(searchQ)||p.local.toLowerCase().includes(searchQ)).forEach(p=>{if(cols[p.estado]!==undefined)cols[p.estado].push(p);else cols["Pendiente"].push(p);});
+  [["Pendiente","pending"],["En proceso","process"],["Completado","done"]].forEach(([estado,key])=>{
+    const its=cols[estado];
+    document.getElementById(`k-count-${key}`).textContent=its.length;
+    document.getElementById(`k-${key}`).innerHTML=its.length?its.map(p=>{
+      const color=LOCALES[p.local]||"#888";
+      const pc=p.prioridad==="Alta"?"pa":p.prioridad==="Media"?"pm":p.prioridad==="Baja"?"pb":"";
+      const next=estado==="Pendiente"?"En proceso":estado==="En proceso"?"Completado":"Pendiente";
+      const nl=estado==="Pendiente"?"→ Procesar":estado==="En proceso"?"→ Completar":"↩ Reabrir";
+      return`<div class="kcard"><div class="klocal" style="color:${color}">${p.local}</div><div class="ktxt">${p.pendiente}</div><div class="kmeta">${p.prioridad?`<span class="pill ${pc}" style="font-size:9px">${p.prioridad}</span>`:""}${p.deadline?`<span class="pill pd" style="font-size:9px">📅 ${p.deadline}</span>`:""}</div><div class="kact"><button class="kbtn" onclick="moveEstado('${p.id}','${next}')">${nl}</button><button class="kbtn" onclick="editItem('${p.id}')">✏️</button></div></div>`;
+    }).join(""):`<div style="text-align:center;padding:2rem;font-size:12px;color:var(--text3)">Sin items</div>`;
+  });
+}
+
+async function toggleDone(id,estado){await moveEstado(id,estado==="Completado"?"Pendiente":"Completado");}
+async function moveEstado(id,newEstado){
+  try{await apiCall("update","PATCH",{properties:{"Estado":{select:{name:newEstado}}}},id);items.find(p=>p.id===id&&(p.estado=newEstado));renderAll();toast(`→ ${newEstado}`);}
+  catch(e){toast("Error: "+e.message,true);}
+}
+
+function showView(v){
+  ["dashboard","list","kanban"].forEach(x=>{document.getElementById(`view-${x}`).style.display=x===v?"block":"none";document.getElementById(`nav-${x}`).classList.toggle("active",x===v);});
+  document.getElementById("pageTitle").textContent={dashboard:"Dashboard",list:"Lista de pendientes",kanban:"Kanban"}[v];
+}
+
+function onSearch(){searchQ=document.getElementById("searchInput").value.toLowerCase().trim();renderList();renderKanban();}
+
+function openModal(reset=true){
+  if(reset){editId=null;document.getElementById("modalTitle").textContent="Nuevo pendiente";document.getElementById("saveBtn").textContent="Agregar";["fLocal","fPendiente","fDeadline","fPrioridad","fNotas"].forEach(id=>document.getElementById(id).value="");document.getElementById("fEstado").value="Pendiente";}
+  document.getElementById("modalErr").style.display="none";document.getElementById("overlay").classList.add("open");
+}
+function closeModal(){document.getElementById("overlay").classList.remove("open");editId=null;}
+
+function editItem(id){
+  const p=items.find(x=>x.id===id);if(!p)return;editId=id;
+  document.getElementById("modalTitle").textContent="Editar pendiente";document.getElementById("saveBtn").textContent="Guardar cambios";
+  document.getElementById("fLocal").value=p.local;document.getElementById("fPendiente").value=p.pendiente;
+  document.getElementById("fDeadline").value=p.deadline;document.getElementById("fPrioridad").value=p.prioridad;
+  document.getElementById("fNotas").value=p.notas;document.getElementById("fEstado").value=p.estado||"Pendiente";
+  openModal(false);
+}
+
+async function save(){
+  const local=document.getElementById("fLocal").value,pendiente=document.getElementById("fPendiente").value.trim();
+  const deadline=document.getElementById("fDeadline").value,prioridad=document.getElementById("fPrioridad").value;
+  const notas=document.getElementById("fNotas").value.trim(),estado=document.getElementById("fEstado").value;
+  const err=document.getElementById("modalErr");
+  if(!local||!pendiente){showE(err,"Local y pendiente son obligatorios");return;}
+  const props={"Pendiente":{title:[{text:{content:pendiente}}]},"Local":{select:{name:local}},"Notas":{rich_text:notas?[{text:{content:notas}}]:[]},"Estado":{select:{name:estado}}};
+  if(prioridad)props["Prioridad"]={select:{name:prioridad}};
+  if(deadline)props["Deadline"]={date:{start:deadline}};
+  document.getElementById("saveBtn").disabled=true;err.style.display="none";
+  try{
+    if(editId){await apiCall("update","PATCH",{properties:props},editId);toast("Actualizado en Notion ✓");}
+    else{await apiCall("create","POST",{parent:{database_id:dbId},properties:props});toast("Agregado a Notion ✓");}
+    closeModal();await load();
+  }catch(e){showE(err,"Error: "+e.message);}
+  finally{document.getElementById("saveBtn").disabled=false;}
+}
+
+async function deleteItem(id){
+  if(!confirm("¿Eliminar?"))return;
+  try{await apiCall("delete","PATCH",null,id);toast("Eliminado");await load();}
+  catch(e){toast("Error: "+e.message,true);}
+}
+
+function showE(el,msg){el.textContent=msg;el.style.display="block";}
+function toast(msg,isErr=false){const t=document.getElementById("toast");t.textContent=msg;t.className="toast"+(isErr?" terr":"");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
+
+window.onload=()=>{
+  const t=localStorage.getItem("pm_token"),d=localStorage.getItem("pm_dbid");
+  if(t&&d){token=t;dbId=d;document.getElementById("setup").style.display="none";document.getElementById("app").style.display="block";load(true).catch(()=>{token="";dbId="";document.getElementById("setup").style.display="flex";document.getElementById("app").style.display="none";});}
+  if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js");}
+};
+</script>
+</body>
+</html>
